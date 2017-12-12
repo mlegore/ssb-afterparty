@@ -11,7 +11,7 @@ function map(obj, iter) {
   return o
 }
 
-module.exports = function (api, overwrite = false)  {
+module.exports = function (api, since, overwrite = false)  {
   if (!('_views' in api))
     api._views = []
 
@@ -25,7 +25,7 @@ module.exports = function (api, overwrite = false)  {
           //destroy should close the sink stream,
           //which will restart the write.
           var rm = sv.since(function (v) {
-            if(v === api.since.value) {
+            if(v === since().value) {
               rm()
               cb()
             }
@@ -51,7 +51,7 @@ module.exports = function (api, overwrite = false)  {
       get: function (n, cb) {
         api.get(n, cb)
       },
-      since: api.since,
+      since: since(),
       stream: function (opts) {
         var pause = require('pull-pause')()
         return pull(
@@ -68,7 +68,7 @@ module.exports = function (api, overwrite = false)  {
     }
 
     var sv = createView(log, name)
-    views[name] = api[name] = sv // wrap(sv, api.since, ready)
+    views[name] = api[name] = sv // wrap(sv, since, ready)
 
     sv.since.once(function build (upto) {
       pull(

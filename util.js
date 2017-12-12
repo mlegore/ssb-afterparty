@@ -1,5 +1,5 @@
 var mapMerge = require('map-merge')
-
+var pullObv = require('pull-obv')
 var isArray = Array.isArray
 
 module.exports.clone = function clone (obj, mapper) {
@@ -63,4 +63,34 @@ module.exports.mergePermisson = function mergePermissions (perms, _perms, name) 
       return name ? name + '.' + v : v
     })
   )
+}
+
+module.exports.getSince = function (api) {
+  if ('sinceStream' in api) {
+    return pullObv((state, item) => item, api.sinceStream())
+  }
+
+  if ('since' in api) {
+    return poll(cb => api.since(cb), val => val, 200)
+  }
+
+  if ('status' in api) {
+    return poll(cb => api.status(cb), val => val.sync.since, 200)
+  }
+
+  throw new Error('Cannot find or emulate since parameter')
+}
+
+function poll (f, select, interval) {
+  var obv = Obv()
+  var updateSince = function () {
+    f((err, val) => {
+      if(err)
+        throw err
+      obv.set(select(val))
+      setTimeout(updateSince, interval)
+    })
+  }
+  updateSince()
+  return obv
 }

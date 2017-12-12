@@ -1,7 +1,8 @@
 var mapMerge = require('map-merge')
 var Hookable = require('hoox')
 var flumeFill = require('./flume')
-const {clone, mergeApi, mergePermissions, mergeManifest, hookOptionalCB} = require ('./util')
+const {clone, mergeApi, mergePermissions,
+  mergeManifest, hookOptionalCB, getSince} = require ('./util')
 
 module.exports = function (api, opts = {}) {
   var plugins = []
@@ -44,7 +45,14 @@ module.exports = function (api, opts = {}) {
     }
   }
 
-  api = flumeFill(api)
+  var cached
+  var since = () => {
+    if (cached)
+      return cached
+    cached = getSince(api)
+    return cached
+  }
+  api = flumeFill(api, since)
   return api
 }
 
