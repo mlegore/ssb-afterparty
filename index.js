@@ -1,6 +1,7 @@
 var MultiServer = require('multiserver')
 var muxrpc = require('muxrpc')
 var pull = require('pull-stream')
+var plugify = require('./plugify')
 
 module.exports = function (inputRemote, inputChannels, outputChannels, forward, cb) {
   if (!cb && 'function' === typeof forward) {
@@ -19,6 +20,8 @@ module.exports = function (inputRemote, inputChannels, outputChannels, forward, 
       // otherwise exclude them, so they're local methods only
       if (forward)
         sbot.manifest = syncToAsync(manifest)
+
+      sbot = plugify(sbot)
 
       var api = {
         start () {
