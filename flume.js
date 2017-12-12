@@ -3,6 +3,7 @@ var pull = require('pull-stream')
 var PullCont = require('pull-cont')
 var path = require('path')
 var Obv = require('obv')
+var wrap = require('./flume-wrap')
 
 function map(obj, iter) {
   var o = {}
@@ -14,6 +15,10 @@ function map(obj, iter) {
 module.exports = function (api, since, overwrite = false)  {
   if (!('_views' in api))
     api._views = []
+
+  // Hard code to true for now
+  var ready = Obv()
+  ready.set(true)
 
   var views = []
   var closed = false
@@ -56,29 +61,19 @@ module.exports = function (api, since, overwrite = false)  {
         var pause = require('pull-pause')()
         return pull(
           api.createLogStream({seq: true, values: true, keys: true}),
-          pull.filter(msg => !msg.sync),
-          pull.map(msg => {
-            return {
-              timestamp: msg.timestamp, value: msg
-            }}
-          )
+          pull.filter(msg => !msg.sync)
         )
       },
       append: function () {}
     }
 
     var sv = createView(log, name)
-    views[name] = api[name] = sv // wrap(sv, since, ready)
+    views[name] = api[name] = wrap(sv, since(), ready)
 
     sv.since.once(function build (upto) {
       pull(
         api.createLogStream({gt: upto, live: true, seq: true, values: true}),
         pull.filter(msg => !msg.sync),
-        pull.map(msg => {
-          return {
-            timestamp: msg.timestamp, value: msg
-          }}
-        ),
         sv.createSink(function (err) {
           if(err && !closed) throw err
           else if(!closed)
