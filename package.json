@@ -1,0 +1,18 @@
+{
+  "name": "ssb-afterparty",
+  "version": "0.0.1",
+  "description": "ssb view pipe, for adding plugins after the party has started",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "muxrpc": "^6.3.3"
+  },
+  "devDependencies": {
+    "rimraf": "^2.6.1",
+    "tape": "^4.6.3"
+  },
+  "author": "mlegore",
+  "license": "Fair"
+}
