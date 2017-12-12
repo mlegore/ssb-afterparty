@@ -1,5 +1,6 @@
 var mapMerge = require('map-merge')
-var pullObv = require('pull-obv')
+var Obv = require('obv')
+var pull = require('pull-stream')
 var isArray = Array.isArray
 
 module.exports.clone = function clone (obj, mapper) {
@@ -67,7 +68,14 @@ module.exports.mergePermisson = function mergePermissions (perms, _perms, name) 
 
 module.exports.getSince = function (api) {
   if ('sinceStream' in api) {
-    return pullObv((state, item) => item, api.sinceStream())
+    var obv = Obv()
+    pull(
+      api.sinceStream(),
+      pull.drain(val => {
+        obv.set(val)
+      })
+    )
+    return obv
   }
 
   if ('since' in api) {
