@@ -7,11 +7,11 @@
     "test": "node test.js"
   },
   "dependencies": {
+    "multiserver": "^1.10.0",
     "muxrpc": "^6.3.3"
   },
   "devDependencies": {
-    "rimraf": "^2.6.1",
-    "tape": "^4.6.3"
+    "tape": "^4.8.0"
   },
   "author": "mlegore",
   "license": "Fair"
