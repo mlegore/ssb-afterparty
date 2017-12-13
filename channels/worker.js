@@ -27,3 +27,9 @@ module.exports.pullWorker = function pullWorker (agent, channel) {
 
   return duplex
 }
+
+module.exports.workerServer = function (channel) {
+  return function (onConnect) {
+    onConnect(stream)
+  }
+}
