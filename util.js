@@ -119,3 +119,7 @@ function poll (f, select, interval) {
   updateSince()
   return obv
 }
+
+module.exports.noop = function noop (err) {
+  if (err) throw explain(err, 'callback not provided')
+}
