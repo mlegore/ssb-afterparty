@@ -33,7 +33,7 @@ var close = ms.server(function (stream) {
   pull(stream, mainApi.createStream(), stream)
 })
 
-test('pipe through', function (t) {
+test('multiserver pipe through', function (t) {
   t.plan(3)
 
   var check = function (apiAtOtherEnd) {

@@ -4,7 +4,7 @@
   "description": "ssb view pipe, for adding plugins after the party has started",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "set -e; for t in test/*.js; do node $t; done"
   },
   "dependencies": {
     "cont": "^1.0.3",
