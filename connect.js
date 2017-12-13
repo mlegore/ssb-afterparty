@@ -83,16 +83,20 @@ module.exports.pipeIn = function pipeIn (api, inputChannel, overwriteOpts) {
 }
 
 module.exports.pipeOut = function (api, manifest, outputChannel) {
-  if (!manifest && api.manifest) {
-    manifest = api.manifest
-  }
-
   if (!manifest) {
     throw new Error('manifest is required')
   }
 
+  manifest['manifest'] = 'sync'
+  var serveApi = {
+    manifest () {
+      return manifest
+    }
+  }
+
+  serveApi.__proto__ = api
   function onConnect (stream) {
-    return pull(stream, toOutputStream(api, manifest), stream)
+    return pull(stream, toOutputStream(serveApi, manifest), stream)
   }
 
   // If outputChannel is a duplex stream, just use that, otherwise
