@@ -5,10 +5,10 @@ module.exports.pullParent = function (channel) {
   return pullWorker(self, channel)
 }
 
-module.exports.pullWorker = function pullWorker (agent, channel) {
+function pullWorker (agent, channel) {
   var duplex = {
     source: Pushable(),
-    sink: pull.sink(val => {
+    sink: pull.drain(val => {
       if (channel) {
         agent.postMessage({channel: channel, value: val})
       } else {
@@ -23,13 +23,9 @@ module.exports.pullWorker = function pullWorker (agent, channel) {
     } else if (e.data.channel && e.data.channel === channel) {
       duplex.source.push(e.data.value)
     }
-  }
+  })
 
   return duplex
 }
 
-module.exports.workerServer = function (channel) {
-  return function (onConnect) {
-    onConnect(stream)
-  }
-}
+module.exports.pullWorker = pullWorker
