@@ -1,7 +1,8 @@
 var test = require('tape')
 var pull = require('pull-stream')
 var muxrpc = require('muxrpc')
-var afterparty = require('../pipe')
+
+var afterparty = require('..')
 var testPlugin = require('./fixtures/plugin')
 
 var manifest = {

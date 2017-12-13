@@ -3,7 +3,7 @@ var pull = require('pull-stream')
 var muxrpc = require('muxrpc')
 var MultiServer = require('multiserver')
 
-var afterparty = require('../pipe')
+var afterparty = require('..')
 var manifest = {
   test: 'sync',
   manifest: 'sync',

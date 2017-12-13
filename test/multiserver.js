@@ -4,7 +4,7 @@ var muxrpc = require('muxrpc')
 var MultiServer = require('multiserver')
 
 var ms = require('../channels/multiserver')
-var afterparty = require('../pipe')
+var afterparty = require('..')
 
 var manifest = {
   test: 'sync',
