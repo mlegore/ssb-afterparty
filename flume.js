@@ -45,6 +45,16 @@ module.exports = function (api, since, overwrite = false)  {
     })
   }
 
+  function wrapMessage (msg) {
+    if (!msg)
+      return msg
+
+    return {
+      value: msg,
+      seq: msg.value ? msg.value.sequence : null
+    }
+  }
+
   api._flumeUse = function (name, createView) {
     if(!(api.createLogStream && 'function' === typeof api.createLogStream))
       throw "plugin cannot be loaded, need 'createLogStream' to polyfill flume"
@@ -61,7 +71,8 @@ module.exports = function (api, since, overwrite = false)  {
         var pause = require('pull-pause')()
         return pull(
           api.createLogStream({seq: true, values: true, keys: true}),
-          pull.filter(msg => !msg.sync)
+          pull.filter(msg => !msg.sync),
+          pull.map(wrapMessage)
         )
       },
       append: function () {}
@@ -74,6 +85,7 @@ module.exports = function (api, since, overwrite = false)  {
       pull(
         api.createLogStream({gt: upto, live: true, seq: true, values: true}),
         pull.filter(msg => !msg.sync),
+        pull.map(wrapMessage),
         sv.createSink(function (err) {
           if(err && !closed) throw err
           else if(!closed)
