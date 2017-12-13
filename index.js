@@ -54,6 +54,10 @@ module.exports = function (inputChannel, outputChannel, forward) {
           }
         }
 
+        if (!sbot.manifest['manifest']) {
+          sbot.manifest['manifest'] = 'async'
+        }
+
         serveApi.__proto__ = sbot
 
         // set the api to be served, which should then start hooking
