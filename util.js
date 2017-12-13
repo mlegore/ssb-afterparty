@@ -3,7 +3,7 @@ var Obv = require('obv')
 var pull = require('pull-stream')
 var isArray = Array.isArray
 
-module.exports.clone = function clone (obj, mapper) {
+function clone (obj, mapper) {
   function map(v, k) {
     return isObject(v) ? clone(v, mapper) : mapper(v, k)
   }
@@ -123,3 +123,10 @@ function poll (f, select, interval) {
 module.exports.noop = function noop (err) {
   if (err) throw explain(err, 'callback not provided')
 }
+
+function isObject (o) {
+  return o && 'object' === typeof o
+}
+
+module.exports.isObject = isObject
+module.exports.clone = clone
