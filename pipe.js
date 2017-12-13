@@ -71,6 +71,7 @@ module.exports = function (inputChannel, outputChannel, forward) {
         if (started)
           throw new Error('pipe already started, cannot load plugins anymore')
         sbot.use(plugin, overwrite)
+        return createPipe
       }
 
       resolve(createPipe)

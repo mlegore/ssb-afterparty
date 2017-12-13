@@ -1,8 +1,7 @@
 var test = require('tape')
 var pull = require('pull-stream')
 var muxrpc = require('muxrpc')
-var MultiServer = require('multiserver')
-var afterparty = require('..')
+var afterparty = require('../pipe')
 var testPlugin = require('./fixtures/plugin')
 
 var manifest = {
@@ -51,18 +50,7 @@ var api = {
   }
 }
 
-var portIn = 2347
-var portOut = 2348
-
 var mainApi = muxrpc(null, manifest) (api)
-
-var ws = require('multiserver/plugins/ws')({port: portIn})
-var wsOut = require('multiserver/plugins/ws')({port: portOut})
-var ms = MultiServer([ws])
-
-var close = ms.server(function (stream) {
-  pull(stream, mainApi.createStream(), stream)
-})
 
 test('plugin', function (t) {
   t.plan(2)
@@ -75,22 +63,14 @@ test('plugin', function (t) {
     })
   }
 
-  afterparty('ws://localhost:' + portIn, [ws], [wsOut], (err, api) => {
-    api.use(testPlugin)
-    api.start()
-    var wsOut = require('multiserver/plugins/ws')({port: portOut})
-    var ms = MultiServer([ws])
+  var mux = muxrpc((err, manifest, apiAtOtherEnd) => {
+    check(apiAtOtherEnd)
+  }) ()
 
-    ms.client('ws://localhost:' + portOut, function (err, stream) {
-      var mux = muxrpc((err, manifest, apiAtOtherEnd) => {
-        check(apiAtOtherEnd)
-      }) ()
-
-      pull(stream, mux.createStream(), stream)
-    })
-
+  afterparty(mainApi.createStream(), mux.createStream(), true)
+  .then(function(api) {
+    api = api.use(testPlugin)
+    api()
     t.on('end', api.close)
   })
-
-  t.on('end', close)
 })
