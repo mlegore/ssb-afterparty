@@ -2,6 +2,7 @@ var MultiServer = require('multiserver')
 var muxrpc = require('muxrpc')
 var pull = require('pull-stream')
 var plugify = require('./plugify')
+const {syncToAsync} = require('./util')
 
 module.exports = function (inputRemote, inputChannels, outputChannels, forward, cb) {
   if (!cb && 'function' === typeof forward) {
@@ -62,21 +63,4 @@ module.exports = function (inputRemote, inputChannels, outputChannels, forward, 
 
     pull(stream, sbot.createStream(), stream)
   })
-}
-
-// Function to recursively convert all sync manifest methods to async
-function syncToAsync (manifest) {
-  var copy = {}
-
-  Object.keys(manifest).forEach(function(key) {
-    if ('string' !== typeof manifest[key]) {
-      copy[key] = syncToAsync(manifest[key])
-    } else if(manifest[key] === 'sync') {
-      copy[key] = 'async'
-    } else {
-      copy[key] = manifest[key]
-    }
-  })
-
-  return copy
 }

@@ -66,6 +66,23 @@ module.exports.mergePermisson = function mergePermissions (perms, _perms, name) 
   )
 }
 
+// Function to recursively convert all sync manifest methods to async
+module.exports.syncToAsync = function syncToAsync (manifest) {
+  var copy = {}
+
+  Object.keys(manifest).forEach(function(key) {
+    if ('string' !== typeof manifest[key]) {
+      copy[key] = syncToAsync(manifest[key])
+    } else if(manifest[key] === 'sync') {
+      copy[key] = 'async'
+    } else {
+      copy[key] = manifest[key]
+    }
+  })
+
+  return copy
+}
+
 module.exports.getSince = function (api) {
   if ('sinceStream' in api) {
     var obv = Obv()
