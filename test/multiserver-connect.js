@@ -81,7 +81,7 @@ test('multiserver connect pipe through', function (t) {
       api()
       t.on('end', api.close)
     }, function (err) {
-      console.log(err)
+      t.notOk(err)
     })
 
   t.on('end', outputChannel.close)

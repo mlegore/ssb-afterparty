@@ -34,6 +34,8 @@ module.exports.server = function (plugins) {
     close = ms.server(function (stream) {
       onConnect(stream)
     })
+
+    return close
   }
 
   serve.close = function () {
