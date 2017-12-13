@@ -24,6 +24,44 @@ function merge (api, otherApi, overwriteOpts) {
   return api
 }
 
+function fromInputChannel (inputChannel) {
+  return pipeIn({}, inputChannel, true)
+}
+
+function toOutputStream (api, manifest) {
+  if (!manifest && api.manifest) {
+    manifest = api.manifest
+  }
+
+  if (!manifest) {
+    throw new Error('manifest is required')
+  }
+
+  var mux = muxrpc(null, manifest) (api)
+  return mux.createStream()
+}
+
+function inStream (api, overwriteOpts, cb) {
+  if (!cb) {
+    cb = noop
+  }
+
+  var muxready = function (err, manifest, otherApi) {
+    if(err) {
+      cb(err)
+    } else {
+      cb(null, extend(api, otherApi, overwriteOpts))
+    }
+  }
+  var mux = muxrpc(muxready) ()
+
+  return mux.createStream()
+}
+
+module.exports.fromInputChannel = fromInputChannel
+module.exports.toOutputStream = toOutputStream
+module.exports.inStream = inStream
+
 module.exports.pipeIn = function pipeIn (api, inputChannel, overwriteOpts) {
   return new Promise(function (resolve, reject) {
     var apiStream = inStream(api, overwriteOpts, (err, otherApi) => {
@@ -44,27 +82,6 @@ module.exports.pipeIn = function pipeIn (api, inputChannel, overwriteOpts) {
   })
 }
 
-module.exports.fromInput = function (inputChannel) {
-  return pipeIn({}, inputChannel, true)
-}
-
-module.exports.inStream = function inStream (api, overwriteOpts, cb) {
-  if (!cb) {
-    cb = noop
-  }
-
-  var muxready = function (err, manifest, otherApi) {
-    if(err) {
-      cb(err)
-    } else {
-      cb(null, extend(api, otherApi, overwriteOpts))
-    }
-  }
-  var mux = muxrpc(muxready) ()
-
-  return mux.createStream()
-}
-
 module.exports.pipeOut = function (api, manifest, outputChannel) {
   if (!manifest && api.manifest) {
     manifest = api.manifest
@@ -74,23 +91,15 @@ module.exports.pipeOut = function (api, manifest, outputChannel) {
     throw new Error('manifest is required')
   }
 
-  function create () {
-    var mux = muxrpc(null, manifest) (api)
-    return mux.createStream()
-  }
-
   function onConnect (stream) {
-    return pull(stream, create(), stream)
+    return pull(stream, toOutputStream(api, manifest), stream)
   }
 
   // If outputChannel is a duplex stream, just use that, otherwise
-  // connect the outputChannel to the muxrpc factory, if none is
-  // provided, just return the muxrpc stream
+  // connect the outputChannel to the muxrpc factory
   if (outputChannel && outputChannel.sink && outputChannel.source) {
     return onConnect(outputChannel)
   } else if (outputChannel) {
     return outputChannel(onConnect)
-  } else {
-    return create()
   }
 }

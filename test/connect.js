@@ -1,7 +1,7 @@
 var test = require('tape')
 var pull = require('pull-stream')
 var muxrpc = require('muxrpc')
-const {inStream, pipeOut} = require('../connect')
+const {inStream, toOutputStream} = require('../connect')
 
 var afterparty = require('..')
 var testPlugin = require('./fixtures/plugin')
@@ -63,7 +63,7 @@ test('connect pipe through', function (t) {
     })
   }
 
-  afterparty(pipeOut(api, manifest), inStream(api, true, check))
+  afterparty(toOutputStream(api, manifest), inStream(api, true, check))
     .then(function(api) {
       api.use(testPlugin)
       api()
