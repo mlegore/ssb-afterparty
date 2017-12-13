@@ -3,7 +3,7 @@ var pull = require('pull-stream')
 var muxrpc = require('muxrpc')
 var MultiServer = require('multiserver')
 var afterparty = require('..')
-var testPlugin = require('./testPlugin')
+var testPlugin = require('./fixtures/plugin')
 
 var manifest = {
   get: 'async',
@@ -67,7 +67,7 @@ var close = ms.server(function (stream) {
 test('plugin', function (t) {
   t.plan(2)
 
-  var check = function (apiAtOtherEnd) {    
+  var check = function (apiAtOtherEnd) {
     apiAtOtherEnd.testPlugin.get((err, val) => {
       t.notOk(err)
       t.deepEqual(expected, val)
