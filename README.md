@@ -4,17 +4,22 @@ Tools to allow ssb clients to spawn processes to add plugins and views to an alr
 
 ## Components
 
-index.js
+### index.js
 
-This class takes an input client and allows plugins to be attached to it (provides use and \_flumeUse methods)
+This class takes an input channel and output channel and gives you a promise to an extendable sbot pipe to attach plugins to
 
-plugify.js & flume.js
+### plugify.js & flume.js
 
-These modules
+These modules emulate sbot's plugin system and flumeDb for view creation (provides use and \_flumeUse methods)
 
-connect.js
+### connect.js
 
 This module provides methods to augment a running client instance by attaching a view channel or api.
+pipeIn takes an input channel and augments the passed in api with the methods available over the channel.
+pipeOut creates a muxrpc service and connects it to a channel.
+fromInputChannel creates a new api muxrpc from a channel
+toOutputStream creates a muxrpc service channel from an api
+inStream creates a stream that when pulled to, extends api, easy to pass this around
 
     //
     // In the main thread
