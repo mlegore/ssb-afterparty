@@ -1,7 +1,20 @@
 var MultiServer = require('multiserver')
 
-module.exports.client = function (remote, channels) {
-  var ms = MultiServer(channels)
+function checkPlugins (plugins) {
+  if (!plugins) {
+    throw new Error('Must provide at least one plugin')
+  }
+
+  if (!Array.isArray(plugins)) {
+    return [plugins]
+  }
+
+  return plugins
+}
+
+module.exports.client = function (remote, plugins) {
+  plugins = checkPlugins(plugins)
+  var ms = MultiServer(plugins)
   return new Promise(function(resolve, reject) {
     ms.client(remote, function (err, stream) {
       if (err) {
@@ -13,9 +26,10 @@ module.exports.client = function (remote, channels) {
   })
 }
 
-module.exports.server = function (channels) {
+module.exports.server = function (plugins) {
   var close
-  var ms = MultiServer(channels)
+  plugins = checkPlugins(plugins)
+  var ms = MultiServer(plugins)
   var serve = function (onConnect) {
     close = ms.server(function (stream) {
       onConnect(stream)
