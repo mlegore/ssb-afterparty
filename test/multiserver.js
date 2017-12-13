@@ -3,7 +3,9 @@ var pull = require('pull-stream')
 var muxrpc = require('muxrpc')
 var MultiServer = require('multiserver')
 
-var afterparty = require('.')
+var ms = require('../channels/multiserver')
+var afterparty = require('../pipe')
+
 var manifest = {
   test: 'sync',
   manifest: 'sync',
@@ -24,17 +26,17 @@ var api = {
 }
 
 var mainApi = muxrpc(null, manifest) (api)
+var ws = require('multiserver/plugins/ws')({port: 2349})
+var wsOut = require('multiserver/plugins/ws')({port: 2350})
+var server = MultiServer([ws])
 
-var ws = require('multiserver/plugins/ws')({port: 2345})
-var wsOut = require('multiserver/plugins/ws')({port: 2346})
-var ms = MultiServer([ws])
-
-var close = ms.server(function (stream) {
+var close = server.server(function (stream) {
   pull(stream, mainApi.createStream(), stream)
 })
 
 test('multiserver pipe through', function (t) {
   t.plan(3)
+
 
   var check = function (apiAtOtherEnd) {
     apiAtOtherEnd.test('value', (err, ret) => {
@@ -49,12 +51,13 @@ test('multiserver pipe through', function (t) {
       }))
   }
 
-  afterparty('ws://localhost:2345', [ws], [wsOut], (err, api) => {
-    api.start()
-    var wsOut = require('multiserver/plugins/ws')({port: 2346})
-    var ms = MultiServer([ws])
+  afterparty(ms.client('ws://localhost:2349', [ws]), ms.server([wsOut]), true)
+  .then(function (api) {
+    api()
+    var wsOut = require('multiserver/plugins/ws')({port: 2350})
+    var server = MultiServer([ws])
 
-    ms.client('ws://localhost:2346', function (err, stream) {
+    server.client('ws://localhost:2350', function (err, stream) {
       var mux = muxrpc((err, manifest, apiAtOtherEnd) => {
         apiAtOtherEnd._manifest = manifest
         apiAtOtherEnd.manifest = function () {
