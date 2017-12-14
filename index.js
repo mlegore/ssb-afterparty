@@ -5,7 +5,9 @@ var plugify = require('./plugify')
 
 const {syncToAsync} = require('./util')
 
-module.exports = function (inputChannel, outputChannel, forward) {
+module.exports = function (inputChannel, outputChannel, opts) {
+  opts = opts || {}
+
   // muxrpc factory method, wait until muxrpc api is ready, then connect
   // any streams that are waiting, and wait for more connections
   var outputApi = Obv()
@@ -38,10 +40,10 @@ module.exports = function (inputChannel, outputChannel, forward) {
 
       // If we forward piped in methods, include them in the manifest
       // otherwise exclude them, so they're local methods only
-      if (forward)
+      if (opts.forward)
         sbot.manifest = syncToAsync(manifest)
 
-      sbot = plugify(sbot)
+      sbot = plugify(sbot, opts)
       var started
       var createPipe = function (options) {
         started = true

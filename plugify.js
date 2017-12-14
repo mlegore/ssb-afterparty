@@ -52,7 +52,7 @@ module.exports = function (api, opts = {}) {
     cached = getSince(api)
     return cached
   }
-  api = flumeFill(api, since)
+  api = flumeFill(api, since, opts.flumeOpts)
   return api
 }
 

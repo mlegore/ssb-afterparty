@@ -12,7 +12,9 @@ function map(obj, iter) {
   return o
 }
 
-module.exports = function (api, since, overwrite = false)  {
+module.exports = function (api, since, opts)  {
+  opts = opts || {}
+
   if (!('_views' in api))
     api._views = []
 
@@ -58,7 +60,7 @@ module.exports = function (api, since, overwrite = false)  {
   api._flumeUse = function (name, createView) {
     if(!(api.createLogStream && 'function' === typeof api.createLogStream))
       throw "plugin cannot be loaded, need 'createLogStream' to polyfill flume"
-    if(~Object.keys(api).indexOf(name) && !overwrite)
+    if(~Object.keys(api).indexOf(name) && !opts.preventOverwrite)
       throw new Error(name + ' is already in use!')
 
     var log = {
@@ -78,7 +80,7 @@ module.exports = function (api, since, overwrite = false)  {
       append: function () {}
     }
 
-    var sv = createView(log, name)
+    var sv = createView(log, name, opts)
     views[name] = api[name] = wrap(sv, since(), ready)
 
     sv.since.once(function build (upto) {
