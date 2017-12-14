@@ -15,11 +15,11 @@ These modules emulate sbot's plugin system and flumeDb for view creation (provid
 ### connect.js
 
 This module provides methods to augment a running client instance by attaching a view channel or api.
-pipeIn(api, clientChannel) takes an input channel and augments the passed in api with the methods available over the channel.
-pipeOut(api, manifest, serveChannel) creates a muxrpc service and connects it to a channel.
-fromInputChannel(clientChannel) creates a new api muxrpc from a channel
-toOutputStream(api, manifest) creates a muxrpc service channel from an api
-inStream(api, overwriteOpts, cb) creates a stream that when pulled to, extends api, easy to pass this around, cb is called when the api has been extended
+**pipeIn(api, clientChannel)** takes an input channel and augments the passed in api with the methods available over the channel.
+**pipeOut(api, manifest, serveChannel)** creates a muxrpc service and connects it to a channel.
+**fromInputChannel(clientChannel)** creates a new api muxrpc from a channel
+**toOutputStream(api, manifest)** creates a muxrpc service channel from an api
+**inStream(api, overwriteOpts, cb)** creates a stream that when pulled to, extends api, easy to pass this around, cb is called when the api has been extended
 
     //
     // In the main thread
