@@ -14,18 +14,20 @@ var manifest = {
   sinceStream: 'source',
   manifest: 'sync'
 }
+
 var messages = [
-  { val: 'value0', sequence: 0 },
-  { val1: 'value1', sequence: 1 },
-  { val2: 'value2', sequence: 2 },
-  { val: 'othervalue0', sequence: 3 },
-  { val2: 'othervalue2', sequence: 4}
+  { val: 'value0', value: { sequence: 0 } },
+  { val1: 'value1', value: { sequence: 1 } },
+  { val2: 'value2', value: { sequence: 2 } },
+  { val: 'othervalue0', value: { sequence: 3 } },
+  { val2: 'othervalue2', value: { sequence: 4 } }
 ]
 
 var expected = {
   val: 'othervalue0',
   val1: 'value1',
-  val2: 'othervalue2'
+  val2: 'othervalue2',
+  value: { sequence: 4 }
 }
 
 var api = {
