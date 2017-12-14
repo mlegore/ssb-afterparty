@@ -45,7 +45,7 @@ test('pipe through', function (t) {
     check(apiAtOtherEnd)
   }) ()
 
-  afterparty(mainApi.createStream(), mux.createStream(), true)
+  afterparty(mainApi.createStream(), mux.createStream(), { forward: true })
   .then(function(api) {
     api()
     t.on('end', api.close)

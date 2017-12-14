@@ -51,7 +51,7 @@ test('multiserver pipe through', function (t) {
       }))
   }
 
-  afterparty(ms.client('ws://localhost:2349', [ws]), ms.server([wsOut]), true)
+  afterparty(ms.client('ws://localhost:2349', [ws]), ms.server([wsOut]), { forward: true })
   .then(function (api) {
     api()
     var wsOut = require('multiserver/plugins/ws')({port: 2350})
