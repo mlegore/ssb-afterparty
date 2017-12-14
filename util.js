@@ -96,11 +96,11 @@ module.exports.getSince = function (api) {
   }
 
   if ('since' in api) {
-    return poll(cb => api.since(cb), val => val, 200)
+    return poll(cb => api.since(cb), val => val, 2000)
   }
 
   if ('status' in api) {
-    return poll(cb => api.status(cb), val => val.sync.since, 200)
+    return poll(cb => api.status(cb), val => val.sync.since, 2000)
   }
 
   throw new Error('Cannot find or emulate since parameter')
