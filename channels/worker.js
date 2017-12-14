@@ -10,7 +10,7 @@ module.exports.pullParent = function (channel) {
 // isBuffer expects _isBuffer = true
 function box (data, channel) {
   if(Buffer.isBuffer(data)) {
-    var message = { '_isBuffer': true, value: data }
+    var message = { '_isBuffer': true, data: data }
     if (channel) {
       message['channel'] = channel
     }
@@ -18,19 +18,26 @@ function box (data, channel) {
   }
 
   if (channel) {
-    return { channel: channel, value: data }
+    return { channel: channel, data: data }
   }
   return data
 }
 
 function unbox (message) {
   if(message._isBuffer) {
-    message.value = toBuffer(message.value)
-    return message.value
+    message.data = toBuffer(message.data)
+    return message.data
   }
 
   if (message.channel) {
-    return message.value
+    if (message.data && (ArrayBuffer.isView(message.data) || message.data instanceof ArrayBuffer)) {
+      return Buffer.from(message.data)
+    }
+    return message.data
+  }
+
+  if (message && (ArrayBuffer.isView(message) || message instanceof ArrayBuffer)) {
+    return Buffer.from(message)
   }
   return message
 }
@@ -49,7 +56,6 @@ function pullWorker (agent, channel, inWorker) {
   }
 
   var ready = false
-  var listening = false
   var inWork = inWorker
 
   agent.addEventListener('message', function (e) {
