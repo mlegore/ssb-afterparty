@@ -1,9 +1,11 @@
 var pull = require('pull-stream')
 var muxrpc = require('muxrpc')
+var pullThrottle = require('pull-throttle')
+
 const {noop, isObject} = require('./util')
 
 function extend (api, otherApi, overwriteOpts) {
-  return merge(api, otherApi, overwriteOpts === undefined ? true : overwriteOpts)
+  return merge(api, otherApi, (overwriteOpts === undefined || overwriteOpts === null) ? true : overwriteOpts)
 }
 
 module.exports.extend = extend
@@ -62,7 +64,7 @@ module.exports.fromInputChannel = fromInputChannel
 module.exports.toOutputStream = toOutputStream
 module.exports.inStream = inStream
 
-module.exports.pipeIn = function pipeIn (api, inputChannel, overwriteOpts) {
+module.exports.pipeIn = function pipeIn (api, inputChannel, overwriteOpts, throttle) {
   return new Promise(function (resolve, reject) {
     var apiStream = inStream(api, overwriteOpts, (err, otherApi) => {
       if(err) {
@@ -74,15 +76,24 @@ module.exports.pipeIn = function pipeIn (api, inputChannel, overwriteOpts) {
 
     if (inputChannel.then) {
       inputChannel.then(function (stream) {
-        pull(stream, apiStream, stream)
+        if (throttle !== null && throttle !== undefined) {
+          pull(stream, pullThrottle(throttle), apiStream, stream)
+        } else {
+          pull(stream, apiStream, stream)
+        }
+
       }, reject)
     } else {
-      pull(inputChannel, apiStream, inputChannel)
+      if (throttle !== null && throttle !== undefined) {
+        pull(inputChannel, pullThrottle(throttle), apiStream, inputChannel)
+      } else {
+        pull(inputChannel, apiStream, stream)
+      }
     }
   })
 }
 
-module.exports.pipeOut = function (api, manifest, outputChannel) {
+module.exports.pipeOut = function (api, manifest, outputChannel, throttle) {
   if (!manifest) {
     throw new Error('manifest is required')
   }
@@ -94,8 +105,13 @@ module.exports.pipeOut = function (api, manifest, outputChannel) {
     }
   }
 
+
   serveApi.__proto__ = api
   function onConnect (stream) {
+    if (throttle) {
+      return pull(stream, toOutputStream(serveApi, manifest), pullThrottle(throttle), stream)
+    }
+
     return pull(stream, toOutputStream(serveApi, manifest), stream)
   }
 
