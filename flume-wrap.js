@@ -21,10 +21,10 @@ module.exports = function wrap(sv, since, isReady) {
   })
 
   function ready (cb) {
-    if(isReady.value && since.value != null && since.value === sv.since.value) cb()
+    if(isReady.value && since.value != null && since.value <= sv.since.value) cb()
     else
       since.once(function (upto) {
-        if(isReady.value && upto === sv.since.value) cb()
+        if(isReady.value && upto <= sv.since.value) cb()
         else waiting.push({seq: upto, cb: cb})
       })
   }

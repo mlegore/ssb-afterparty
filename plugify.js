@@ -1,8 +1,18 @@
-var mapMerge = require('map-merge')
 var Hookable = require('hoox')
 var flumeFill = require('./flume')
 const {clone, mergeApi, mergePermissions,
   mergeManifest, hookOptionalCB, getSince} = require ('./util')
+
+function merge (a, b, mapper) {
+  for(var k in b) {
+    if(b[k] && 'object' === typeof b[k] && !Buffer.isBuffer(b[k]))
+      merge(a[k] = {}, b[k], mapper)
+    else
+      a[k] = mapper(b[k], k)
+  }
+
+  return a
+}
 
 module.exports = function (api, opts = {}) {
   var plugins = []
@@ -40,7 +50,7 @@ module.exports = function (api, opts = {}) {
           mergePermissions(api.permissions, plug.permissions, name)
 
       plugins.push(plug)
-      init(api, plug, opts)
+      api = init(api, plug, opts)
       return api
     }
   }
@@ -64,7 +74,7 @@ function init (api, plug, opts) {
     var o = {}; o[plug.name] = _api; _api = o
   }
 
-  return mapMerge(api, _api, function (v, k) {
+  return merge(api, _api, function (v, k) {
     if ('function' === typeof v) {
       v = Hookable(v)
       if (plug.manifest && plug.manifest[k] === 'sync') {

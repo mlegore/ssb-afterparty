@@ -13,7 +13,7 @@ exports.init = function (ssb, config) {
 
 function reduce (result, item) {
   if (!result) result = {}
-  if (item) {
+  if (item && item.value) {
     Object.keys(item).forEach(key => {
       result[key] = item[key]
     })

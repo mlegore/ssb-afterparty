@@ -67,6 +67,8 @@ module.exports = function (api, since, opts)  {
     if(~Object.keys(api).indexOf(name) && !opts.preventOverwrite)
       throw new Error(name + ' is already in use!')
 
+    var flume = {}
+
     var log = {
       dir: opts.dir,
       filename: opts.filename,
@@ -85,7 +87,7 @@ module.exports = function (api, since, opts)  {
     }
 
     var sv = createView(log, name, opts)
-    views[name] = api[name] = wrap(sv, since(), ready)
+    views[name] = flume[name] = wrap(sv, since(), ready)
 
     sv.since.once(function build (upto) {
       pull(
@@ -104,7 +106,7 @@ module.exports = function (api, since, opts)  {
       closed = true
     }
 
-    return api
+    return flume[name]
   }
 
   return api
