@@ -68,7 +68,7 @@ module.exports = function (api, since, opts)  {
       throw new Error(name + ' is already in use!')
 
     var log = {
-      dir: null,
+      dir: opts.flumeDir,
       get: function (n, cb) {
         api.get(n, cb)
       },
