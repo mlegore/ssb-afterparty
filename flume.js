@@ -51,9 +51,13 @@ module.exports = function (api, since, opts)  {
     if (!msg)
       return msg
 
+    if (since().value < msg.timestamp) {
+      since().set(msg.timestamp)
+    }
+
     return {
       value: msg,
-      seq: msg.value ? msg.value.sequence : null
+      seq: msg.timestamp
     }
   }
 
@@ -70,7 +74,6 @@ module.exports = function (api, since, opts)  {
       },
       since: since(),
       stream: function (opts) {
-        var pause = require('pull-pause')()
         return pull(
           api.createLogStream({seq: true, values: true, keys: true}),
           pull.filter(msg => !msg.sync),

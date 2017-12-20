@@ -83,6 +83,13 @@ module.exports.syncToAsync = function syncToAsync (manifest) {
   return copy
 }
 
+var getLatestTimestamp = function (api, cb) {
+  pull(
+    api.latest(),
+    pull.reduce((max, item) => item.ts > max ? item.ts : max, 0, cb)
+  )
+}
+
 module.exports.getSince = function (api) {
   if ('sinceStream' in api) {
     var obv = Obv()
@@ -93,6 +100,10 @@ module.exports.getSince = function (api) {
       })
     )
     return obv
+  }
+
+  if ('latest' in api) {
+    return poll(cb => getLatestTimestamp(api, cb), val => val, 5000)
   }
 
   if ('since' in api) {
