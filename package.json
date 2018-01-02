@@ -1,6 +1,6 @@
 {
   "name": "ssb-afterparty",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "ssb view pipe, for adding plugins after the party has started",
   "main": "index.js",
   "scripts": {
