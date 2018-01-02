@@ -119,15 +119,21 @@ module.exports.getSince = function (api) {
 
 function poll (f, select, interval) {
   var obv = Obv()
+  var close = false
   var updateSince = function () {
     f((err, val) => {
       if(err)
         throw err
       obv.set(select(val))
-      setTimeout(updateSince, interval)
+      if (!close)
+        setTimeout(updateSince, interval)
     })
   }
+  
   updateSince()
+  obv.close = function () {
+    close = true
+  }
   return obv
 }
 

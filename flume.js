@@ -104,6 +104,9 @@ module.exports = function (api, since, opts)  {
 
     api.close = function () {
       closed = true
+      var s = since()
+      if(s.close)
+        s.close()
     }
 
     return flume[name]

@@ -71,6 +71,7 @@ module.exports = function (inputChannel, outputChannel, opts) {
       createPipe.close = function () {
         if (outputChannel.close) {
           outputChannel.close()
+          sbot.close()
         }
       }
       createPipe.use = function (plugin, overwrite) {
