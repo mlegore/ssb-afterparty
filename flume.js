@@ -71,7 +71,7 @@ module.exports = function (api, since, opts)  {
 
     var log = {
       dir: opts.dir,
-      filename: opts.filename,
+      filename: opts.dir + "/dummy.txt",
       get: function (n, cb) {
         api.get(n, cb)
       },
@@ -86,7 +86,7 @@ module.exports = function (api, since, opts)  {
       append: function () {}
     }
 
-    var sv = createView(log, name, opts)
+    var sv = createView(log, name)
     views[name] = flume[name] = wrap(sv, since(), ready)
 
     sv.since.once(function build (upto) {
